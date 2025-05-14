@@ -20,16 +20,21 @@
   <button id="start-btn">Start Game</button>
   <div id="game"></div>
   <audio id="audio"></audio>
+  <audio id="correct-sound" src="assets/audio/correct.mp3"></audio>
+  <audio id="wrong-sound" src="assets/audio/wrong.mp3"></audio>
   <div id="result"></div>
   <script>
     const animals = ["kappa","dolphin","shark","octopus","crab","turtle","squid","crocodile","starfish","clownfish"];
     let shuffled = [];
     let currentRound = 0;
     let score = 0;
+
     const startBtn = document.getElementById('start-btn');
     const gameDiv = document.getElementById('game');
     const scoreDiv = document.getElementById('score');
     const audioPlayer = document.getElementById('audio');
+    const correctSound = document.getElementById('correct-sound');
+    const wrongSound = document.getElementById('wrong-sound');
     const resultDiv = document.getElementById('result');
 
     startBtn.addEventListener('click', startGame);
@@ -40,6 +45,7 @@
       shuffled = shuffle(animals.slice());
       scoreDiv.textContent = `Score: ${score}/10`;
       startBtn.disabled = true;
+      startBtn.textContent = 'Playing...';
       nextRound();
     }
 
@@ -71,26 +77,30 @@
     }
 
     function handleImageClick(event) {
+      document.querySelectorAll('#game img').forEach(img => img.removeEventListener('click', handleImageClick));
+
       const selected = event.target.dataset.name;
       const target = shuffled[currentRound];
+
       if (selected === target) {
         score++;
-        showResult('Correct!');
+        correctSound.play();
         event.target.classList.add('correct');
-        event.target.removeEventListener('click', handleImageClick);
-        scoreDiv.textContent = `Score: ${score}/10`;
-        currentRound++;
-        setTimeout(nextRound, 1000);
+        showResult('Correct!');
       } else {
-        showResult('Try again!');
+        wrongSound.play();
         event.target.classList.add('wrong');
-        setTimeout(() => { event.target.classList.remove('wrong'); }, 500);
+        showResult('Wrong!');
       }
+
+      scoreDiv.textContent = `Score: ${score}/10`;
+      currentRound++;
+      setTimeout(nextRound, 1000);
     }
 
     function showResult(msg) {
       resultDiv.textContent = msg;
-      setTimeout(() => { resultDiv.textContent = ''; }, 500);
+      setTimeout(() => { resultDiv.textContent = ''; }, 800);
     }
 
     function endGame() {
