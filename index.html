@@ -53,7 +53,7 @@
     startBtn.addEventListener('click', () => {
       startBtn.disabled = true;
       repeatBtn.disabled = true;
-      speak('ゲームを始めます。動物の名前を聞いたら、該当する絵をクリックしてください。10問チャレンジしましょう。', initGame);
+      speak('ゲームを始めます。英語を聞いて、あてはまるAnimalをクリックしてください。10問チャレンジしましょう。', initGame);
     });
 
     repeatBtn.addEventListener('click', () => {
@@ -123,7 +123,7 @@
     }
 
     function endGame() {
-      const finalMsg = `おめでとう！${score}個正解！`;
+      const finalMsg = `おめでとう！${score}個正解です！`;
       speak(finalMsg);
       resultDiv.textContent = finalMsg;
       startBtn.disabled = false;
