@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,11 +16,11 @@
   </style>
 </head>
 <body>
-  <h1>Sea Animal Matching Game</h1>
+  <h1>海の動物マッチングゲーム</h1>
   <div id="score">Score: 0/10</div>
   <div id="controls">
-    <button id="start-btn">Start Game</button>
-    <button id="repeat-btn" disabled>Repeat Sound</button>
+    <button id="start-btn">ゲームを開始</button>
+    <button id="repeat-btn" disabled>再生</button>
   </div>
   <div id="game"></div>
   <audio id="audio"></audio>
@@ -32,6 +32,7 @@
     let shuffled = [];
     let currentRound = 0;
     let score = 0;
+    let currentTarget = '';
 
     const startBtn = document.getElementById('start-btn');
     const repeatBtn = document.getElementById('repeat-btn');
@@ -42,20 +43,32 @@
     const wrongSound = document.getElementById('wrong-sound');
     const resultDiv = document.getElementById('result');
 
-    startBtn.addEventListener('click', startGame);
-    repeatBtn.addEventListener('click', () => {
-      audioPlayer.currentTime = 0;
-      audioPlayer.play();
+    function speak(text, callback) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'ja-JP';
+      utter.onend = callback;
+      window.speechSynthesis.speak(utter);
+    }
+
+    startBtn.addEventListener('click', () => {
+      startBtn.disabled = true;
+      repeatBtn.disabled = true;
+      speak('ゲームを始めます。動物の名前を聞いたら、該当する絵をクリックしてください。10問チャレンジしましょう。', initGame);
     });
 
-    function startGame() {
+    repeatBtn.addEventListener('click', () => {
+      if (currentTarget) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+      }
+    });
+
+    function initGame() {
       score = 0;
       currentRound = 0;
       shuffled = shuffle(animals.slice());
       scoreDiv.textContent = `Score: ${score}/10`;
-      startBtn.disabled = true;
       repeatBtn.disabled = false;
-      startBtn.textContent = 'Playing...';
       nextRound();
     }
 
@@ -72,7 +85,7 @@
         endGame();
         return;
       }
-      const target = shuffled[currentRound];
+      currentTarget = shuffled[currentRound];
       gameDiv.innerHTML = '';
       animals.forEach(animal => {
         const img = document.createElement('img');
@@ -82,17 +95,14 @@
         img.addEventListener('click', handleImageClick);
         gameDiv.appendChild(img);
       });
-      audioPlayer.src = `assets/audio/${target}.mp3`;
+      audioPlayer.src = `assets/audio/${currentTarget}.mp3`;
       audioPlayer.play();
     }
 
     function handleImageClick(event) {
       document.querySelectorAll('#game img').forEach(img => img.removeEventListener('click', handleImageClick));
-
       const selected = event.target.dataset.name;
-      const target = shuffled[currentRound];
-
-      if (selected === target) {
+      if (selected === currentTarget) {
         score++;
         correctSound.play();
         event.target.classList.add('correct');
@@ -102,7 +112,6 @@
         event.target.classList.add('wrong');
         showResult('Wrong!');
       }
-
       scoreDiv.textContent = `Score: ${score}/10`;
       currentRound++;
       setTimeout(nextRound, 1000);
@@ -114,10 +123,12 @@
     }
 
     function endGame() {
-      resultDiv.textContent = `Game Over! You scored ${score}/10.`;
+      const finalMsg = `おめでとう！${score}個正解！`;
+      speak(finalMsg);
+      resultDiv.textContent = finalMsg;
       startBtn.disabled = false;
+      startBtn.textContent = 'もう一度';
       repeatBtn.disabled = true;
-      startBtn.textContent = 'Play Again';
     }
   </script>
 </body>
