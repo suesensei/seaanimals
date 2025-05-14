@@ -11,13 +11,17 @@
     .correct { opacity: 0.5; }
     .wrong { border: 3px solid red; }
     #score, #result { margin-top: 10px; font-size: 1.2em; }
-    #start-btn { margin-top: 20px; padding: 10px 20px; font-size: 1em; }
+    #controls { margin-top: 20px; }
+    #controls button { margin: 0 5px; padding: 10px 20px; font-size: 1em; }
   </style>
 </head>
 <body>
   <h1>Sea Animal Matching Game</h1>
   <div id="score">Score: 0/10</div>
-  <button id="start-btn">Start Game</button>
+  <div id="controls">
+    <button id="start-btn">Start Game</button>
+    <button id="repeat-btn" disabled>Repeat Sound</button>
+  </div>
   <div id="game"></div>
   <audio id="audio"></audio>
   <audio id="correct-sound" src="assets/audio/correct.mp3"></audio>
@@ -30,6 +34,7 @@
     let score = 0;
 
     const startBtn = document.getElementById('start-btn');
+    const repeatBtn = document.getElementById('repeat-btn');
     const gameDiv = document.getElementById('game');
     const scoreDiv = document.getElementById('score');
     const audioPlayer = document.getElementById('audio');
@@ -38,6 +43,10 @@
     const resultDiv = document.getElementById('result');
 
     startBtn.addEventListener('click', startGame);
+    repeatBtn.addEventListener('click', () => {
+      audioPlayer.currentTime = 0;
+      audioPlayer.play();
+    });
 
     function startGame() {
       score = 0;
@@ -45,6 +54,7 @@
       shuffled = shuffle(animals.slice());
       scoreDiv.textContent = `Score: ${score}/10`;
       startBtn.disabled = true;
+      repeatBtn.disabled = false;
       startBtn.textContent = 'Playing...';
       nextRound();
     }
@@ -106,6 +116,7 @@
     function endGame() {
       resultDiv.textContent = `Game Over! You scored ${score}/10.`;
       startBtn.disabled = false;
+      repeatBtn.disabled = true;
       startBtn.textContent = 'Play Again';
     }
   </script>
